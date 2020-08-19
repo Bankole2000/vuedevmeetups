@@ -68,7 +68,7 @@
     <v-app-bar fixed color="deep-purple" dark>
       <v-app-bar-nav-icon
         @click="drawer = true"
-        class="hidden-sm-and-up "
+        class="hidden-sm-and-up"
       ></v-app-bar-nav-icon>
 
       <v-toolbar-title
@@ -82,7 +82,7 @@
       <v-toolbar-items class="hidden-xs-only">
         <v-btn
           text
-          v-for="item in links"
+          v-for="item in menuItems"
           :key="item.text"
           router
           :to="item.route"
@@ -90,12 +90,40 @@
           <v-icon left>{{ item.icon }}</v-icon>
           {{ item.text }}
         </v-btn>
+        <v-btn @click="onLogout"
+          ><v-icon left>mdi-logout-variant</v-icon> Logout</v-btn
+        >
       </v-toolbar-items>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer" absolute temporary>
-      <v-list nav v-for="item in links" :key="item.text">
-        <v-list-item-group active-class="deep-purple--text text--accent-4">
+    <v-navigation-drawer
+      v-model="drawer"
+      fixed
+      temporary
+      class="deep-purple darken-3"
+      dark
+      height="100vh"
+    >
+      <v-list-item two-line v-if="userIsAuthenticated">
+        <v-list-item-avatar>
+          <img :src="userImage" />
+        </v-list-item-avatar>
+
+        <v-list-item-content>
+          <v-list-item-title
+            ><router-link to="/" tag="span" style="cursor: pointer;"
+              >DEV<span class="orange--text" style="font-weight: bold;"
+                >MEETUP</span
+              ></router-link
+            ></v-list-item-title
+          >
+          <v-list-item-subtitle>{{ userDetails.email }}</v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-divider></v-divider>
+      <v-list nav v-for="item in menuItems" :key="item.text">
+        <v-list-item-group active-class="primary">
           <v-list-item router :to="item.route">
             <v-list-item-icon>
               <v-icon>{{ item.icon }}</v-icon>
@@ -104,30 +132,79 @@
           </v-list-item>
         </v-list-item-group>
       </v-list>
+      <!-- <v-list>
+        <v-list-item-group active-class="deep-purple--text text--accent-4">
+          <v-list-item>
+            <v-list-item-icon>
+              
+            </v-list-item-icon>
+            <v-list-item-title>Logout</v-list-item-title>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list> -->
+
+      <template v-slot:append>
+        <div class="pa-2">
+          <v-btn x-large block @click="onLogout"
+            ><v-icon left>mdi-logout-variant</v-icon> Logout</v-btn
+          >
+        </div>
+      </template>
     </v-navigation-drawer>
   </div>
 </template>
 
 <script>
+import md5 from "md5-hash";
+
 export default {
   data: () => ({
-    drawer: false,
-    links: [
-      { icon: "mdi-home", text: "Home", route: "/" },
-      {
-        icon: "mdi-account-supervisor",
-        text: "View Meetups",
-        route: "/meetups"
-      },
-      {
-        icon: "mdi-chat-sleep",
-        text: "Organize Meetup",
-        route: "/meetup/new"
-      },
-      { icon: "mdi-account ", text: "Profile", route: "/profile" },
-      { icon: "mdi-pencil", text: "Sign up", route: "/signup" },
-      { icon: "mdi-login", text: "Log in", route: "/signin" }
-    ]
-  })
+    drawer: false
+  }),
+  methods: {
+    onLogout() {
+      this.$store.dispatch("logout");
+    }
+  },
+  computed: {
+    menuItems() {
+      let menuItems = [
+        { icon: "mdi-pencil", text: "Sign up", route: "/signup" },
+        { icon: "mdi-login", text: "Log in", route: "/signin" }
+      ];
+      if (this.userIsAuthenticated) {
+        menuItems = [
+          { icon: "mdi-home", text: "Home", route: "/" },
+          {
+            icon: "mdi-account-supervisor",
+            text: "View Meetups",
+            route: "/meetups"
+          },
+          {
+            icon: "mdi-chat-sleep",
+            text: "Organize Meetup",
+            route: "/meetup/new"
+          },
+          { icon: "mdi-account ", text: "Profile", route: "/profile" }
+        ];
+      }
+      console.log(menuItems);
+      return menuItems;
+    },
+    userIsAuthenticated() {
+      return (
+        this.$store.getters.user !== null &&
+        this.$store.getters.user !== undefined
+      );
+    },
+    userDetails() {
+      console.log(this.$store.getters.user);
+      return this.$store.getters.user ? this.$store.getters.user : null;
+    },
+    userImage() {
+      const gravatar = md5(this.$store.getters.user.email.trim().toLowerCase());
+      return `https://www.gravatar.com/avatar/${gravatar}`;
+    }
+  }
 };
 </script>

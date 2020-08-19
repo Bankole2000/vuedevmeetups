@@ -226,7 +226,8 @@ export default {
     meetup() {
       console.log(typeof this.id);
       console.log(this.$store.getters.loadedMeetup(parseInt(this.id, 10)));
-      return this.$store.getters.loadedMeetup(parseInt(this.id, 10));
+      // return this.$store.getters.loadedMeetup(parseInt(this.id, 10));
+      return this.$store.getters.loadedMeetup(this.id);
     },
     createBackgroundString() {
       return `linear-gradient(${this.angle}deg, ${this.color1}, ${this.color2})`;

@@ -34,7 +34,7 @@
           </v-col>
         </v-row>
 
-        <v-card max-width="344" class="mx-auto">
+        <!-- <v-card max-width="344" class="mx-auto">
           <v-list-item>
             <v-list-item-avatar color="grey"></v-list-item-avatar>
             <v-list-item-content>
@@ -70,8 +70,8 @@
               <v-icon>mdi-share-variant</v-icon>
             </v-btn>
           </v-card-actions>
-        </v-card>
-        <v-card class="mx-auto" max-width="400">
+        </v-card> -->
+        <!-- <v-card class="mx-auto" max-width="400">
           <v-list-item two-line>
             <v-list-item-content>
               <v-list-item-title class="headline"
@@ -139,8 +139,8 @@
           <v-card-actions>
             <v-btn text>Full Report</v-btn>
           </v-card-actions>
-        </v-card>
-        <v-card :loading="loading" class="mx-auto my-12" max-width="374">
+        </v-card> -->
+        <!-- <v-card :loading="loading" class="mx-auto my-12" max-width="374">
           <v-img
             height="250"
             src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
@@ -202,8 +202,8 @@
               Reserve
             </v-btn>
           </v-card-actions>
-        </v-card>
-        <v-card class="mx-auto" color="#26c6da" dark max-width="400">
+        </v-card> -->
+        <!-- <v-card class="mx-auto" color="#26c6da" dark max-width="400">
           <v-card-title>
             <v-icon large left>
               mdi-twitter
@@ -238,8 +238,8 @@
               </v-row>
             </v-list-item>
           </v-card-actions>
-        </v-card>
-        <v-card class="mx-auto" max-width="344">
+        </v-card> -->
+        <!-- <v-card class="mx-auto" max-width="344">
           <v-img
             src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
             height="200px"
@@ -283,8 +283,8 @@
               </v-card-text>
             </div>
           </v-expand-transition>
-        </v-card>
-        <v-card max-width="400" class="mx-auto">
+        </v-card> -->
+        <!-- <v-card max-width="400" class="mx-auto">
           <v-system-bar color="pink darken-2" dark>
             <v-spacer></v-spacer>
 
@@ -346,8 +346,8 @@
               </v-col>
             </v-row>
           </v-container>
-        </v-card>
-        <v-card class="mx-auto" max-width="500">
+        </v-card> -->
+        <!-- <v-card class="mx-auto" max-width="500">
           <v-system-bar color="indigo darken-2" dark>
             <v-spacer></v-spacer>
 
@@ -402,8 +402,8 @@
               </v-col>
             </v-row>
           </v-container>
-        </v-card>
-        <v-card class="mx-auto" max-width="400">
+        </v-card> -->
+        <!-- <v-card class="mx-auto" max-width="400">
           <v-img
             class="white--text align-end"
             height="200px"
@@ -429,8 +429,8 @@
               Explore
             </v-btn>
           </v-card-actions>
-        </v-card>
-        <v-card class="mx-auto" max-width="344">
+        </v-card> -->
+        <!-- <v-card class="mx-auto" max-width="344">
           <v-card-text>
             <div>Word of the Day</div>
             <p class="display-1 text--primary">
@@ -447,8 +447,8 @@
               Learn More
             </v-btn>
           </v-card-actions>
-        </v-card>
-        <v-card class="d-inline-block mx-auto">
+        </v-card> -->
+        <!-- <v-card class="d-inline-block mx-auto">
           <v-container>
             <v-row justify="space-between">
               <v-col cols="auto">
@@ -482,8 +482,8 @@
               </v-col>
             </v-row>
           </v-container>
-        </v-card>
-        <v-card class="mx-auto" max-width="344" outlined>
+        </v-card> -->
+        <!-- <v-card class="mx-auto" max-width="344" outlined>
           <v-list-item three-line>
             <v-list-item-content>
               <div class="overline mb-4">OVERLINE</div>
@@ -507,7 +507,7 @@
             <v-btn text>Button</v-btn>
             <v-btn text>Button</v-btn>
           </v-card-actions>
-        </v-card>
+        </v-card> -->
       </v-col>
     </v-row>
   </v-container>
@@ -570,6 +570,7 @@ export default {
   },
   computed: {
     meetups() {
+      console.log(this.$store.getters.loadedMeetups);
       return this.$store.getters.loadedMeetups;
     }
   },

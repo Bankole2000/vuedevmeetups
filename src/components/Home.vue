@@ -15,11 +15,24 @@
     </v-row>
     <v-row>
       <v-col cols="12">
+        <v-row class="my-16" align="center" v-if="loading" justify="center">
+          <v-progress-circular
+            :size="200"
+            :width="7"
+            color="purple"
+            indeterminate
+          ></v-progress-circular>
+        </v-row>
+
         <v-carousel
           cycle
+          progress
+          progress-color="red"
+          interval="5000"
           continuous
           style="cursor:pointer;"
           show-arrows-on-hover
+          v-if="!loading"
         >
           <v-carousel-item
             v-for="(meetup, i) in meetups"
@@ -50,6 +63,9 @@ export default {
   computed: {
     meetups() {
       return this.$store.getters.featuredMeetups;
+    },
+    loading() {
+      return this.$store.getters.loading;
     }
   },
   methods: {

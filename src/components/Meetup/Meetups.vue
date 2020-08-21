@@ -4,7 +4,11 @@
       <v-col cols="12">
         <v-row class="d-flex justify-center">
           <v-col v-for="(item, i) in meetups" :key="i" cols="12" sm="8" md="8">
-            <v-card :color="item.color" dark>
+            <v-card
+              color="primary"
+              :style="{ backgroundImage: createBackgroundString(item.color) }"
+              dark
+            >
               <div class="d-flex flex-no-wrap justify-start">
                 <v-avatar class="ma-3" size="125" tile>
                   <v-img
@@ -575,10 +579,62 @@ export default {
     }
   },
   methods: {
+    padZero(str, len) {
+      len = len || 2;
+      var zeros = new Array(len).join("0");
+      return (zeros + str).slice(-len);
+    },
+    invertColor(hex) {
+      if (hex.indexOf("#") === 0) {
+        hex = hex.slice(1);
+      }
+      // convert 3-digit hex to 6-digits.
+      if (hex.length === 3) {
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+      }
+      if (hex.length !== 6) {
+        throw new Error("Invalid HEX color.");
+      }
+      // invert color components
+      var r = (255 - parseInt(hex.slice(0, 2), 16)).toString(16),
+        g = (255 - parseInt(hex.slice(2, 4), 16)).toString(16),
+        b = (255 - parseInt(hex.slice(4, 6), 16)).toString(16);
+      // pad each with zeros and return
+      return "#" + this.padZero(r) + this.padZero(g) + this.padZero(b);
+    },
+    changeColorLuminance(hex, lum) {
+      // validate hex string
+      hex = String(hex).replace(/[^0-9a-f]/gi, "");
+      if (hex.length < 6) {
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+      }
+      lum = lum || 0;
+
+      // convert to decimal and change luminosity
+      var rgb = "#",
+        c,
+        i;
+      for (i = 0; i < 3; i++) {
+        c = parseInt(hex.substr(i * 2, 2), 16);
+        c = Math.round(Math.min(Math.max(0, c + c * lum), 255)).toString(16);
+        rgb += ("00" + c).substr(c.length);
+      }
+
+      return rgb;
+    },
     reserve() {
       this.loading = true;
 
       setTimeout(() => (this.loading = false), 2000);
+    },
+    createBackgroundString(color) {
+      console.log(
+        `"background-image: linear-gradient(to right, ${color}EE, ${color}00);"`
+      );
+      return `linear-gradient(to top right, ${color}FF, ${this.changeColorLuminance(
+        color,
+        0.5
+      )}FF, ${this.invertColor(color)}00)`;
     }
   }
 };

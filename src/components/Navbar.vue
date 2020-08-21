@@ -64,12 +64,11 @@
       max-height="600"
     >
       <v-container style="height: 1500px;"></v-container>
-    </v-sheet> -->
+    </v-sheet>
+    class="hidden-sm-and-up"
+     -->
     <v-app-bar fixed color="deep-purple" dark>
-      <v-app-bar-nav-icon
-        @click="drawer = true"
-        class="hidden-sm-and-up"
-      ></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
 
       <v-toolbar-title
         ><router-link to="/" tag="span" style="cursor: pointer;"
@@ -90,7 +89,7 @@
           <v-icon left>{{ item.icon }}</v-icon>
           {{ item.text }}
         </v-btn>
-        <v-btn @click="onLogout"
+        <v-btn text v-if="userIsAuthenticated" @click="onLogout"
           ><v-icon left>mdi-logout-variant</v-icon> Logout</v-btn
         >
       </v-toolbar-items>
@@ -100,7 +99,7 @@
       v-model="drawer"
       fixed
       temporary
-      class="deep-purple darken-3"
+      color="#673ab7"
       dark
       height="100vh"
     >
@@ -143,7 +142,7 @@
         </v-list-item-group>
       </v-list> -->
 
-      <template v-slot:append>
+      <template v-if="userIsAuthenticated" v-slot:append>
         <div class="pa-2">
           <v-btn x-large block @click="onLogout"
             ><v-icon left>mdi-logout-variant</v-icon> Logout</v-btn
@@ -164,6 +163,7 @@ export default {
   methods: {
     onLogout() {
       this.$store.dispatch("logout");
+      this.$router.push("/");
     }
   },
   computed: {

@@ -24,3 +24,8 @@ export default {
   })
 };
 </script>
+<style>
+/* body #app {
+  background-color: #191919;
+} */
+</style>

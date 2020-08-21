@@ -95,6 +95,7 @@ export default new Vuex.Store({
               title: obj[key].title,
               description: obj[key].description,
               imageUrl: obj[key].imageUrl,
+              location: obj[key].location,
               color: obj[key].color,
               date: obj[key].date,
               creatorId: obj[key].creatorId
@@ -109,33 +110,130 @@ export default new Vuex.Store({
         });
     },
     createMeetup({ commit, getters }, payload) {
-      const meetup = {
-        title: payload.title,
-        location: payload.location,
-        imageUrl: payload.imageUrl,
-        description: payload.description,
-        date: payload.date ? payload.date.toISOString() : Date.now().toString(),
-        color: payload.color,
-        creatorId: getters.user.id
-        // id: payload.id ? payload.id : Date.now()
-      };
-      // NOTE: that you should run async code only in actions
-      // NOTE: the collection doesn't have to exist yet
-      // NOTE: you can remove the id property coz fb creates that automatically
-      firebase
-        .database()
-        .ref("meetups")
-        .push(meetup)
-        .then((data) => {
-          const key = data.key;
-          console.log(data);
-          commit("createMeetup", {
-            ...meetup,
-            id: key
+      if (payload.useImageUrl) {
+        const meetup = {
+          title: payload.title,
+          location: payload.location,
+          imageUrl: payload.imageUrl,
+          description: payload.description,
+          date: payload.date
+            ? payload.date.toISOString()
+            : Date.now().toString(),
+          color: payload.color,
+          creatorId: getters.user.id
+          // id: payload.id ? payload.id : Date.now()
+        };
+        // NOTE: that you should run async code only in actions
+        // NOTE: the collection doesn't have to exist yet
+        // NOTE: you can remove the id property coz fb creates that automatically
+        firebase
+          .database()
+          .ref("meetups")
+          .push(meetup)
+          .then((data) => {
+            const key = data.key;
+            console.log(data);
+            commit("createMeetup", {
+              ...meetup,
+              id: key
+            });
+          })
+          .catch((error) => console.log(error));
+        // Reach out to storage (firebase || mysql) and store data
+      } else {
+        const meetup = {
+          title: payload.title,
+          location: payload.location,
+          // imageUrl: payload.imageUrl,
+          description: payload.description,
+          date: payload.date
+            ? payload.date.toISOString()
+            : Date.now().toString(),
+          color: payload.color,
+          creatorId: getters.user.id
+          // id: payload.id ? payload.id : Date.now()
+        };
+        // NOTE: that you should run async code only in actions
+        // NOTE: the collection doesn't have to exist yet
+        // NOTE: you can remove the id property coz fb creates that automatically
+        let key, imageUrl;
+        firebase
+          .database()
+          .ref("meetups")
+          .push(meetup)
+          .then((data) => {
+            key = data.key;
+            console.log(data);
+            // commit("createMeetup", {
+            //   ...meetup,
+            //   id: key
+            // });
+            return key;
+          })
+          .then((key) => {
+            const fileName = payload.image.name;
+            const ext = fileName.slice(fileName.lastIndexOf("."));
+            const storageRef = firebase
+              .storage()
+              .ref(`meetups/${key}.${ext}`)
+              .put(payload.image);
+            storageRef.on(
+              "state_changed",
+              (snapshot) => {
+                let uploadValue =
+                  (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log(uploadValue);
+              },
+              (error) => {
+                console.log(error.message);
+              },
+              () => {
+                storageRef.snapshot.ref
+                  .getDownloadURL()
+                  .then((url) => {
+                    imageUrl = url;
+                    return firebase
+                      .database()
+                      .ref("meetups")
+                      .child(key)
+                      .update({ imageUrl: imageUrl });
+                  })
+                  .then(() => {
+                    commit("createMeetup", {
+                      ...meetup,
+                      imageUrl,
+                      id: key
+                    });
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  });
+              }
+            );
           });
-        })
-        .catch((error) => console.log(error));
-      // Reach out to storage (firebase || mysql) and store data
+        // .then((fileData) => {
+        //   return fileData.snapshot.ref.getDownloadURL();
+        // })
+        // .then((imageUrl) => {
+        //   return firebase
+        //     .database()
+        //     .ref("meetups")
+        //     .child(key)
+        //     .update({ imageUrl: imageUrl });
+        // })
+        // .then(() => {
+        //   commit("createMeetup", {
+        //     ...meetup,
+        //     imageUrl,
+        //     id: key
+        //   });
+        // })
+        // .catch((error) => {
+        //   console.log(error);
+        // });
+
+        // Reach out to storage (firebase || mysql) and store data
+      }
     },
     signUserUp({ commit }, payload) {
       commit("setLoading", true);

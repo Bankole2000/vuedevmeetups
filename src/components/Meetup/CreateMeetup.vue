@@ -20,7 +20,18 @@
               hint="e.g. My Awesome Meetup"
             >
             </v-text-field>
+            <!-- <v-switch v-model="useImageUrl" :label="imageTypeLabel"></v-switch> -->
+            <v-radio-group
+              v-model="useImageUrl"
+              @change="checkImageType($event)"
+              row
+              mandatory
+            >
+              <v-radio label="Use Image Url" :value="true"></v-radio>
+              <v-radio label="Upload Image File" :value="false"></v-radio>
+            </v-radio-group>
             <v-text-field
+              v-if="useImageUrl"
               v-model="imageUrl"
               label="Image Url"
               append-icon="mdi-link"
@@ -30,6 +41,14 @@
               outlined
             >
             </v-text-field>
+            <v-file-input
+              v-else
+              label="Upload Image"
+              solo
+              prepend-icon="mdi-camera"
+              accept="image/*"
+              @change="onFilePicked($event)"
+            ></v-file-input>
             <div class="subheading" v-if="imageUrl">Image Preview</div>
             <v-img
               v-if="imageUrl"
@@ -106,6 +125,8 @@ export default {
       location: "",
       datePicker: new Date().toISOString().substr(0, 10),
       timePicker: "00:00",
+      image: null,
+      useImageUrl: true,
       color: { name: "Dark Grey", value: "#282828" },
       colors: [
         { name: "Dark Grey", value: "#282828" },
@@ -122,24 +143,63 @@ export default {
   methods: {
     onCreateMeetup() {
       this.loading = true;
-      const meetupData = {
-        title: this.title,
-        location: this.location,
-        description: this.description,
-        imageUrl: this.imageUrl,
-        color: this.color.value,
-        date: this.submitableDateTime
-      };
-      console.log(meetupData);
+      let meetupData;
+      if (this.useImageUrl) {
+        meetupData = {
+          useImageUrl: this.useImageUrl,
+          title: this.title,
+          location: this.location,
+          description: this.description,
+          imageUrl: this.imageUrl,
+          color: this.color.value,
+          date: this.submitableDateTime
+        };
+        console.log(meetupData);
+      } else {
+        if (!this.image) {
+          return;
+        }
+        meetupData = {
+          useImageUrl: this.useImageUrl,
+          title: this.title,
+          location: this.location,
+          description: this.description,
+          image: this.image,
+          color: this.color.value,
+          date: this.submitableDateTime
+        };
+        console.log(meetupData);
+      }
 
       this.$store.dispatch("createMeetup", meetupData);
       setTimeout(() => {
         this.loading = false;
         this.$router.push("/meetups");
       }, 2000);
+    },
+    onFilePicked(file) {
+      console.log(file);
+      const fileReader = new FileReader();
+      fileReader.addEventListener("load", () => {
+        this.imageUrl = fileReader.result;
+      });
+      fileReader.readAsDataURL(file);
+      this.image = file;
+
+      // const files = event.target.files;
+      // let fileName = files[0].filename;
+      // console.log(fileName);
+    },
+    checkImageType(event) {
+      console.log(event);
+      // this.useImageUrl = event;
+      console.log(typeof this.useImageUrl, this.useImageUrl);
     }
   },
   computed: {
+    imageTypeLabel() {
+      return this.useImageUrl ? "Use Image Url" : "Upload Image File";
+    },
     formIsValid() {
       return (
         this.title !== "" &&

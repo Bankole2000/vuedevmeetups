@@ -14,7 +14,9 @@ export default new Vuex.Store({
         description: "lorem ipsum dolor sit amet",
         date: new Date(),
         color: "#1F7087",
-        postedBy: "Foster the People"
+        postedBy: "Foster the People",
+        creatorId: "",
+        creatorImage: ""
       },
       {
         imageUrl: "https://cdn.vuetifyjs.com/images/carousel/sky.jpg",
@@ -66,6 +68,20 @@ export default new Vuex.Store({
     },
     clearError(state) {
       state.error = null;
+    },
+    updateMeetup(state, payload) {
+      const meetup = state.loadedMeetups.find((meetup) => {
+        return meetup.id == payload.id;
+      });
+      if (payload.title) {
+        meetup.title = payload.title;
+      }
+      if (payload.description) {
+        meetup.description = payload.description;
+      }
+      if (payload.date) {
+        meetup.date = payload.date;
+      }
     }
   },
   actions: {
@@ -109,6 +125,32 @@ export default new Vuex.Store({
           console.log(error);
         });
     },
+    updateMeetupData({ commit }, payload) {
+      commit("setLoading", true);
+      const updateObj = {};
+      if (payload.title) {
+        updateObj.title = payload.title;
+      }
+      if (payload.description) {
+        updateObj.description = payload.description;
+      }
+      if (payload.date) {
+        updateObj.date = payload.date;
+      }
+      firebase
+        .database()
+        .ref("meetups")
+        .child(payload.id)
+        .update(updateObj)
+        .then(() => {
+          commit("updateMeetup", payload);
+          commit("setLoading", false);
+        })
+        .catch((error) => {
+          commit("setLoading", false);
+          console.log(error);
+        });
+    },
     createMeetup({ commit, getters }, payload) {
       if (payload.useImageUrl) {
         const meetup = {
@@ -120,7 +162,8 @@ export default new Vuex.Store({
             ? payload.date.toISOString()
             : Date.now().toString(),
           color: payload.color,
-          creatorId: getters.user.id
+          creatorId: getters.user.id,
+          creatorImage: payload.creatorImage
           // id: payload.id ? payload.id : Date.now()
         };
         // NOTE: that you should run async code only in actions
@@ -150,7 +193,8 @@ export default new Vuex.Store({
             ? payload.date.toISOString()
             : Date.now().toString(),
           color: payload.color,
-          creatorId: getters.user.id
+          creatorId: getters.user.id,
+          creatorImage: payload.creatorImage
           // id: payload.id ? payload.id : Date.now()
         };
         // NOTE: that you should run async code only in actions

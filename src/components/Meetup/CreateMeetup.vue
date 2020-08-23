@@ -115,11 +115,15 @@
 </template>
 
 <script>
+import md5 from "md5-hash";
+
 export default {
   data() {
     return {
       title: "",
       loading: false,
+      creator: this.userDetails,
+      creatorImage: this.userImage,
       imageUrl: null,
       description: "",
       location: "",
@@ -152,7 +156,8 @@ export default {
           description: this.description,
           imageUrl: this.imageUrl,
           color: this.color.value,
-          date: this.submitableDateTime
+          date: this.submitableDateTime,
+          creatorImage: this.creatorImage
         };
         console.log(meetupData);
       } else {
@@ -166,7 +171,8 @@ export default {
           description: this.description,
           image: this.image,
           color: this.color.value,
-          date: this.submitableDateTime
+          date: this.submitableDateTime,
+          creatorImage: this.creatorImage
         };
         console.log(meetupData);
       }
@@ -208,11 +214,16 @@ export default {
         this.description !== ""
       );
     },
+    userDetails() {
+      console.log(this.$store.getters.user);
+      return this.$store.getters.user;
+    },
     submitableDateTime() {
       const date = new Date(this.datePicker);
 
       if (typeof this.timePicker === "string") {
         console.log("string", this.timePicker, date);
+        console.log(this.$store.getters.user);
         let hours = this.timePicker.match(/^(\d+)/)[1];
         let minutes = this.timePicker.match(/:(\d+)/)[1];
 
@@ -225,6 +236,10 @@ export default {
       }
       console.log(date);
       return date;
+    },
+    userImage() {
+      const gravatar = md5(this.$store.getters.user.email.trim().toLowerCase());
+      return `https://www.gravatar.com/avatar/${gravatar}`;
     }
   }
 };

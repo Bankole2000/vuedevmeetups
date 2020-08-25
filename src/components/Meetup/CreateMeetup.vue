@@ -157,7 +157,7 @@ export default {
           imageUrl: this.imageUrl,
           color: this.color.value,
           date: this.submitableDateTime,
-          creatorImage: this.creatorImage
+          creatorImage: this.userImage
         };
         console.log(meetupData);
       } else {
@@ -172,7 +172,7 @@ export default {
           image: this.image,
           color: this.color.value,
           date: this.submitableDateTime,
-          creatorImage: this.creatorImage
+          creatorImage: this.userImage
         };
         console.log(meetupData);
       }

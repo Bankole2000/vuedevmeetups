@@ -114,7 +114,8 @@ export default new Vuex.Store({
               location: obj[key].location,
               color: obj[key].color,
               date: obj[key].date,
-              creatorId: obj[key].creatorId
+              creatorId: obj[key].creatorId,
+              creatorImage: obj[key].creatorImage
             });
           }
           commit("setLoadedMeetups", meetups);

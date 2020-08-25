@@ -73,7 +73,12 @@
     <v-container class="mt-16" style="padding-top: 160px;" v-if="!loading">
       <v-card class="mx-auto">
         <v-list-item :style="{ backgroundColor: meetup.color }" dark>
-          <v-list-item-avatar color="grey"></v-list-item-avatar>
+          <v-list-item-avatar
+            :style="{ border: `1px solid ${invertColor(meetup.color)}` }"
+            :color="invertColor(meetup.color)"
+            ><img :src="meetup.creatorImage"
+          /></v-list-item-avatar>
+
           <v-list-item-content>
             <v-list-item-title class="headline">{{
               meetup.title
@@ -91,7 +96,7 @@
             :meetup="meetup"
             :colorname="meetup.color"
           ></app-edit-meetup-dialogue>
-          <v-btn
+          <!-- <v-btn
             v-if="userIsCreator"
             absolute
             dark
@@ -102,7 +107,7 @@
             style="z-index: 0;"
           >
             <v-icon>mdi-comment-edit-outline</v-icon>
-          </v-btn>
+          </v-btn> -->
           {{ meetup.description }}
         </v-card-text>
 
@@ -239,13 +244,37 @@ export default {
     },
     reserve() {
       return false;
+    },
+    padZero(str, len) {
+      len = len || 2;
+      var zeros = new Array(len).join("0");
+      return (zeros + str).slice(-len);
+    },
+    invertColor(hex) {
+      if (hex.indexOf("#") === 0) {
+        hex = hex.slice(1);
+      }
+      // convert 3-digit hex to 6-digits.
+      if (hex.length === 3) {
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+      }
+      if (hex.length !== 6) {
+        throw new Error("Invalid HEX color.");
+      }
+      // invert color components
+      var r = (255 - parseInt(hex.slice(0, 2), 16)).toString(16),
+        g = (255 - parseInt(hex.slice(2, 4), 16)).toString(16),
+        b = (255 - parseInt(hex.slice(4, 6), 16)).toString(16);
+      // pad each with zeros and return
+      return "#" + this.padZero(r) + this.padZero(g) + this.padZero(b);
     }
   },
   computed: {
     meetup() {
       console.log(typeof this.id);
-      console.log(this.$store.getters.loadedMeetup(parseInt(this.id, 10)));
+      // console.log(this.$store.getters.loadedMeetup(parseInt(this.id, 10)));
       // return this.$store.getters.loadedMeetup(parseInt(this.id, 10));
+      console.log(this.$store.getters.loadedMeetup(this.id));
       return this.$store.getters.loadedMeetup(this.id);
     },
     userIsAuthenticated() {
